@@ -154,21 +154,15 @@ src="https://www.facebook.com/tr?id=641108990769540&ev=PageView&noscript=1"/></n
 
 /* ===================== CONFIGURAÇÃO ===================== */
 const CONFIG = {
-  // Captura de leads → grupo "LM - Quizz - Abril 2026" (mesmo do Typeform). Testado: {"success":true}.
-  mailerlite: {
-    enabled: true,
-    endpoint: "https://assets.mailerlite.com/jsonp/147889/forms/190694977215399794/subscribe"
+  // Backend (Vercel) · mete o lead ACTIVO no MailerLite (grupo do quiz), SEM opt-in, e guarda
+  // resultado, pontuação, origem (UTMs) e as 7 respostas. A chave do MailerLite fica na Vercel.
+  backend: {
+    endpoint: "https://ebs-webhooks.vercel.app/api/quiz"
   },
   // Destino "O Plano" (27€). UTMs para veres no Stripe/Woo quem comprou vindo do quiz.
   plano: {
     base: "https://www.eventbusinessschool.pt/o-plano-para-viver-de-eventos",
     utm: { utm_source: "quiz", utm_medium: "site", utm_campaign: "viver-de-eventos" }
-  },
-  // Registo das respostas numa Google Sheet (via Apps Script Web App ou webhook do Make).
-  // Cola o URL em "endpoint" e mete enabled:true.
-  sheet: {
-    enabled: false,
-    endpoint: ""
   }
 };
 
@@ -373,34 +367,26 @@ function renderName(){
 }
 
 /* --- Submeter lead + calcular resultado --- */
-function captureLead(){
-  if(!CONFIG.mailerlite.enabled || !lead.email) return;
-  const body = new URLSearchParams();
-  body.append('fields[email]', lead.email);
-  if(lead.name) body.append('fields[name]', lead.name);
-  body.append('ml-submit','1'); body.append('anticsrf','true');
-  // fire-and-forget + keepalive (conclui mesmo se navegar logo a seguir)
-  try { fetch(CONFIG.mailerlite.endpoint, { method:'POST', body, keepalive:true }).catch(()=>{}); } catch(e){}
-}
 function outcomeFor(s){ return OUTCOMES.find(o=>s>=o.min&&s<=o.max) || OUTCOMES[0]; }
 function planoLink(key){
   const p = new URLSearchParams(Object.assign({}, CONFIG.plano.utm, {utm_content:key}));
   return CONFIG.plano.base + '?' + p.toString();
 }
 function ansText(i){ return (answersIdx[i]!=null && QUESTIONS[i]) ? QUESTIONS[i].a[answersIdx[i]][0] : ''; }
-function logToSheet(){
-  if(!CONFIG.sheet.enabled || !CONFIG.sheet.endpoint) return;
+function sendLead(){
+  if(!CONFIG.backend.endpoint || !lead.email) return;
   const o = outcomeFor(score);
   const dest = o.type==='plano' ? planoLink(o.key) : o.url;
   const q = new URLSearchParams(location.search);
   const payload = {
-    nome: lead.name, email: lead.email,
+    email: lead.email, nome: lead.name,
     resultado: o.title.replace(/<[^>]+>/g,''), pontuacao: score, destino: dest,
     r1:ansText(0), r2:ansText(1), r3:ansText(2), r4:ansText(3), r5:ansText(4), r6:ansText(5), r7:ansText(6),
     utm_source:q.get('utm_source')||'', utm_campaign:q.get('utm_campaign')||'', utm_content:q.get('utm_content')||''
   };
-  try { fetch(CONFIG.sheet.endpoint, { method:'POST', mode:'no-cors', keepalive:true,
-        headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload) }).catch(()=>{}); } catch(e){}
+  // Vercel: lead ACTIVO no MailerLite + guarda tudo. Fire-and-forget + keepalive.
+  try { fetch(CONFIG.backend.endpoint, { method:'POST', keepalive:true,
+        headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) }).catch(()=>{}); } catch(e){}
 }
 function submitAndResult(){
   if(submitted) return;            // guarda contra duplo-submit
@@ -408,8 +394,7 @@ function submitAndResult(){
   const fb = document.getElementById('finish'); if(fb) fb.disabled = true;
   phase='result'; setProgress(TOTAL_STEPS); updateBack();
   score = answers.reduce((a,b)=>a+(b||0),0);
-  captureLead();
-  logToSheet();
+  sendLead();
   if(typeof fbq==='function'){ try{ fbq('track','Lead'); }catch(e){} }   // evento Meta para campanha de Leads
   show(`
     <p class="step">O teu resultado</p>
