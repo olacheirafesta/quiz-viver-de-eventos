@@ -127,6 +127,19 @@ body.in-iframe #stage{align-items:flex-start;min-height:auto;padding-top:clamp(7
   #stage{padding-top:76px;align-items:flex-start}
 }
 </style>
+<!-- Meta Pixel · Píxel de Adriana - EBS Novo -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init','641108990769540');
+fbq('track','PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=641108990769540&ev=PageView&noscript=1"/></noscript>
+<!-- End Meta Pixel -->
 </head>
 <body>
 <div id="progress"></div>
@@ -150,6 +163,12 @@ const CONFIG = {
   plano: {
     base: "https://www.eventbusinessschool.pt/o-plano-para-viver-de-eventos",
     utm: { utm_source: "quiz", utm_medium: "site", utm_campaign: "viver-de-eventos" }
+  },
+  // Registo das respostas numa Google Sheet (via Apps Script Web App ou webhook do Make).
+  // Cola o URL em "endpoint" e mete enabled:true.
+  sheet: {
+    enabled: false,
+    endpoint: ""
   }
 };
 
@@ -368,6 +387,21 @@ function planoLink(key){
   const p = new URLSearchParams(Object.assign({}, CONFIG.plano.utm, {utm_content:key}));
   return CONFIG.plano.base + '?' + p.toString();
 }
+function ansText(i){ return (answersIdx[i]!=null && QUESTIONS[i]) ? QUESTIONS[i].a[answersIdx[i]][0] : ''; }
+function logToSheet(){
+  if(!CONFIG.sheet.enabled || !CONFIG.sheet.endpoint) return;
+  const o = outcomeFor(score);
+  const dest = o.type==='plano' ? planoLink(o.key) : o.url;
+  const q = new URLSearchParams(location.search);
+  const payload = {
+    nome: lead.name, email: lead.email,
+    resultado: o.title.replace(/<[^>]+>/g,''), pontuacao: score, destino: dest,
+    r1:ansText(0), r2:ansText(1), r3:ansText(2), r4:ansText(3), r5:ansText(4), r6:ansText(5), r7:ansText(6),
+    utm_source:q.get('utm_source')||'', utm_campaign:q.get('utm_campaign')||'', utm_content:q.get('utm_content')||''
+  };
+  try { fetch(CONFIG.sheet.endpoint, { method:'POST', mode:'no-cors', keepalive:true,
+        headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload) }).catch(()=>{}); } catch(e){}
+}
 function submitAndResult(){
   if(submitted) return;            // guarda contra duplo-submit
   submitted = true;
@@ -375,6 +409,8 @@ function submitAndResult(){
   phase='result'; setProgress(TOTAL_STEPS); updateBack();
   score = answers.reduce((a,b)=>a+(b||0),0);
   captureLead();
+  logToSheet();
+  if(typeof fbq==='function'){ try{ fbq('track','Lead'); }catch(e){} }   // evento Meta para campanha de Leads
   show(`
     <p class="step">O teu resultado</p>
     <h2 class="h-q">A preparar o teu resultado…</h2>
