@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Será que viver de eventos é mesmo para ti? · Event Business School™</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/playfair.css">
+<style>
+/* ============================================================
+   QUIZ · Será que viver de eventos é mesmo para ti?
+   Réplica do Typeform (zwy0TTKZ), uma pergunta de cada vez.
+   Paleta EBS Summer Camp · beige + verde · Playfair + Helvetica.
+   ============================================================ */
+:root{
+  --bg:#FAF7F1;              /* beige (fundo) */
+  --green:#2E5135;          /* verde (respostas, botões, acentos) */
+  --green-deep:#1F2A1B;     /* verde escuro (títulos, texto principal) */
+  --cream:#FAF7F1;          /* creme (texto sobre verde) */
+  --soft:rgba(31,42,27,.66);
+  --line:rgba(46,81,53,.26);
+  --line-2:rgba(46,81,53,.5);
+  --serif:"Playfair Display",Didot,"Bodoni MT","Times New Roman",serif;
+  --sans:"Helvetica Neue","Helvetica","Arial",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg); color:var(--green-deep);
+  font-family:var(--sans); font-weight:300;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  min-height:100vh; min-height:100dvh; overflow-x:hidden; overflow-y:auto;
+}
+
+/* Barra de progresso */
+#progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--green);
+  z-index:40;transition:width .45s cubic-bezier(.4,0,.2,1)}
+
+/* Monograma */
+.brand{position:fixed;top:clamp(16px,2.4vw,28px);left:clamp(18px,3vw,40px);z-index:30}
+.brand img{height:clamp(30px,3.4vw,40px);width:auto;display:block;opacity:.92}
+
+/* Palco */
+#stage{position:relative;min-height:100vh;min-height:100dvh;display:flex;align-items:center;
+  justify-content:center;padding:clamp(84px,12vh,120px) clamp(22px,6vw,80px) clamp(48px,8vh,72px)}
+/* Em iframe (Wix) alinhar ao topo para resultados longos não serem cortados */
+body.in-iframe #stage{align-items:flex-start;min-height:auto;padding-top:clamp(72px,9vh,104px)}
+.screen{width:100%;max-width:760px;margin:0 auto;display:none}
+.screen.active{display:block;animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* Indicador de progresso textual (NÃO é kicker: minúsculas, sem tracking) */
+.step{font-family:var(--sans);font-weight:300;font-size:13px;color:var(--soft);
+  margin:0 0 clamp(16px,2.2vw,22px)}
+
+/* Títulos */
+.h-display{font-family:var(--serif);font-weight:500;line-height:1.02;letter-spacing:-.014em;
+  font-size:clamp(34px,6.4vw,68px);color:var(--green-deep)}
+.h-display em{font-style:italic}
+.h-q{font-family:var(--serif);font-weight:500;line-height:1.08;letter-spacing:-.01em;
+  font-size:clamp(25px,4.4vw,46px);color:var(--green-deep)}
+.h-q em{font-style:italic}
+.lead{font-family:var(--serif);font-weight:400;font-size:clamp(17px,2.1vw,23px);
+  line-height:1.5;color:var(--soft);margin:clamp(20px,3vw,30px) 0 0;max-width:48ch}
+.fine{font-family:var(--sans);font-weight:300;font-size:13.5px;color:var(--soft);
+  margin:clamp(18px,2.6vw,26px) 0 0}
+
+/* Opções */
+.options{list-style:none;margin:clamp(26px,4vw,40px) 0 0;display:grid;gap:12px}
+.opt{width:100%;text-align:left;background:transparent;color:var(--green);
+  border:1px solid var(--line);padding:clamp(15px,1.8vw,19px) clamp(16px,2vw,22px);
+  font-family:var(--sans);font-weight:400;font-size:clamp(15px,1.7vw,17.5px);line-height:1.35;
+  cursor:pointer;display:flex;align-items:center;gap:14px;
+  transition:border-color .18s,background .18s,color .18s,transform .18s}
+.opt .key{flex:none;width:26px;height:26px;border:1px solid var(--line-2);
+  display:grid;place-items:center;font-weight:600;font-size:12px;transition:inherit}
+.opt:hover,.opt:focus-visible{border-color:var(--green);background:rgba(46,81,53,.07);outline:none}
+.opt:hover .key,.opt:focus-visible .key{border-color:var(--green)}
+.opt.sel{background:var(--green);border-color:var(--green);color:var(--cream);transform:translateX(4px)}
+.opt.sel .key{background:var(--cream);color:var(--green);border-color:var(--cream)}
+
+/* Inputs */
+.field{margin:clamp(26px,4vw,40px) 0 0}
+.field input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--line-2);
+  color:var(--green-deep);font-family:var(--serif);font-weight:500;font-size:clamp(22px,3.4vw,34px);
+  padding:0 0 14px;outline:none}
+.field input::placeholder{color:rgba(46,81,53,.5)}
+.field input:focus{border-color:var(--green)}
+.err{display:none;font-family:var(--serif);font-style:italic;font-size:15px;
+  color:var(--green-deep);margin:12px 0 0}
+.err.on{display:block}
+
+/* Botões */
+.actions{margin:clamp(28px,4vw,40px) 0 0;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.btn{appearance:none;border:1px solid var(--green);background:var(--green);color:var(--cream);
+  font-family:var(--sans);font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;
+  padding:16px 30px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:10px;
+  transition:background .2s,color .2s,border-color .2s}
+.btn:hover{background:transparent;color:var(--green);border-color:var(--green)}
+.btn[disabled]{opacity:.5;cursor:default;pointer-events:none}
+.btn .ar{transition:transform .2s}.btn:hover .ar{transform:translateX(5px)}
+.hint{font-family:var(--sans);font-weight:300;font-size:12.5px;color:var(--soft)}
+
+/* Navegação */
+.nav-back{position:fixed;left:clamp(18px,3vw,40px);bottom:clamp(18px,3vh,30px);z-index:30;
+  background:none;border:none;color:var(--soft);font-family:var(--sans);font-weight:400;
+  font-size:13px;cursor:pointer;display:none;align-items:center;gap:8px}
+.nav-back:hover{color:var(--green)}
+.nav-back.show{display:inline-flex}
+
+/* Resultado */
+.result .h-q{margin-bottom:clamp(18px,2.6vw,26px)}
+.result .h-q:focus{outline:none}
+.result .desc{font-family:var(--serif);font-weight:400;font-size:clamp(16px,2vw,20px);
+  line-height:1.55;color:rgba(31,42,27,.82);max-width:54ch}
+.result .desc + .desc{margin-top:14px}
+.result .hello{font-family:var(--serif);font-style:italic;font-weight:500;
+  font-size:clamp(20px,2.6vw,28px);color:var(--green-deep);margin:0 0 clamp(14px,2vw,20px)}
+.spin{width:30px;height:30px;border:2px solid var(--line);border-top-color:var(--green);
+  border-radius:50%;animation:sp .8s linear infinite;margin:6px 0 0}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+:focus-visible{outline:2px solid var(--green);outline-offset:3px}
+
+@media (max-width:600px){
+  .opt.sel{transform:none}
+  #stage{padding-top:76px;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div class="brand"><img src="assets/monogram-black.png" alt="Event Business School™"></div>
+
+<main id="stage" aria-live="polite"></main>
+<button id="back" class="nav-back" type="button" aria-label="Voltar à pergunta anterior">← Voltar</button>
+
+<script>
+(function(){
+'use strict';
+
+/* ===================== CONFIGURAÇÃO ===================== */
+const CONFIG = {
+  // Captura de leads → grupo "LM - Quizz - Abril 2026" (mesmo do Typeform). Testado: {"success":true}.
+  mailerlite: {
+    enabled: true,
+    endpoint: "https://assets.mailerlite.com/jsonp/147889/forms/190694977215399794/subscribe"
+  },
+  // Destino "O Plano" (27€). UTMs para veres no Stripe/Woo quem comprou vindo do quiz.
+  plano: {
+    base: "https://www.eventbusinessschool.pt/o-plano-para-viver-de-eventos",
+    utm: { utm_source: "quiz", utm_medium: "site", utm_campaign: "viver-de-eventos" }
+  }
+};
+
+/* ===================== PERGUNTAS (réplica fiel + pontuação) ===================== */
+const QUESTIONS = [
+  { t: 'Tu és daquelas pessoas que organiza tudo ao pormenor, viagens, festas, a casa e faz isso com <em>prazer</em>?',
+    a: [
+      ['Sim, é natural em mim, as pessoas até me pedem ajuda', 4],
+      ['Sim, mas nunca pensei que pudesse ser profissão', 3],
+      ['Mais ou menos, gosto de algumas partes', 2],
+      ['Não especialmente, o que me atrai nos eventos é outra coisa', 1],
+    ]},
+  { t: 'Quando imaginas a <em>viver de eventos</em>, o que sentes PRIMEIRO?',
+    a: [
+      ['Entusiasmo, o coração acelera', 4],
+      ['Entusiasmo, mas logo vem o medo (será que sou capaz?)', 2],
+      ['Mais dúvida do que entusiasmo', 1],
+      ['Não me imagino a viver disto', 0],
+    ]},
+  { t: 'Na tua vida profissional, já trabalhaste com alguma destas áreas?',
+    a: [
+      ['Comunicação, atendimento ou vendas', 3],
+      ['Organização, coordenação ou gestão', 3],
+      ['Área criativa, design ou decoração', 3],
+      ['Nenhuma destas', 1],
+    ]},
+  { t: 'O que sentes que te falta <em>mais</em> para começar ou crescer nos eventos?',
+    a: [
+      ['Dinheiro para investir em material e espaço', 1],
+      ['Formação e conhecimento técnico', 2],
+      ['Coragem para dar o passo', 1],
+      ['Ter clientes todos os meses', 4],
+    ]},
+  { t: 'Destas 3 coisas, qual <em>mais</em> te trava?',
+    a: [
+      ['Medo, de falhar, de não ser capaz', 1],
+      ['Conhecimento, não sei por onde começar', 1],
+      ['Comprometimento, não consigo decidir avançar', 1],
+      ['Nada me trava, só me faltam clientes', 4],
+    ]},
+  { t: 'Qual frase descreve melhor o <em>teu momento</em>?',
+    a: [
+      ['Nunca fiz eventos para clientes', 1],
+      ['Já comecei, mas ando às voltas', 2],
+      ['Faço eventos, mas não consigo viver disto', 4],
+      ['Tenho negócio, mas quero outro nível', 4],
+    ]},
+  { t: 'Se te dissesse que viver de eventos depende de <em>uma decisão</em>, tomá-la e fazer até dar certo, qual seria a tua reacção?',
+    a: [
+      ['Já tomei essa decisão, falta-me o caminho', 4],
+      ['Quase lá, preciso de mais clareza', 3],
+      ['Assusta-me, e se não der certo?', 1],
+      ['Não estou pronta para essa decisão', 0],
+    ]},
+];
+
+/* ===================== RESULTADOS (por banda de pontuação) ===================== */
+/* Os 2 do topo → O Plano (com UTMs); os outros 3 → YouTube (como no Typeform). */
+const OUTCOMES = [
+  { min:22, max:27, type:'plano', key:'resultado-22-27-proximo-nivel',
+    title:'Estás pronta para o <em>próximo nível.</em>',
+    desc:['Tu não precisas que te convençam. Já sabes que isto é para ti, já o estás a viver. O teu desafio agora não é começar: é teres clientes todos os meses e viveres dos eventos.',
+          'Deixar de depender do boca a boca e construir um negócio de eventos que te dê a vida que queres. A diferença entre quem sobrevive de eventos e quem vive de eventos não é a qualidade do trabalho, é tornares-te a <em>Escolha Óbvia™</em>. E isso constrói-se com um plano.'],
+    cta:'Quero O Plano para Viver de Eventos' },
+
+  { min:17, max:21, type:'plano', key:'resultado-17-21-e-para-ti',
+    title:'<em>É para ti.</em>',
+    desc:['Não tenho dúvidas. Tens aí qualquer coisa que te puxa para os eventos, e já sentes isso há algum tempo. Essa paixão não é por acaso, é a tua excelência a aparecer, algo que fazes com naturalidade e que as outras pessoas já reconhecem em ti.',
+          'O teu próximo passo não é comprar material nem criar uma página no Instagram. É teres um plano simples e claro para transformares essa paixão num trabalho de que <em>vives</em>.'],
+    cta:'Quero O Plano para Viver de Eventos' },
+
+  { min:12, max:16, type:'youtube', url:'https://youtube.com/live/j-wETMZmQ6o?feature=share',
+    title:'É para ti. Mas estás a começar pelo <em>sítio errado.</em>',
+    desc:['Tu queres isto, isso é claro. Mas a ideia que tens na cabeça do que é preciso para começar está a travar-te. Ter material não é sinónimo de ter clientes. Ter um espaço não é sinónimo de profissionalismo. E ter tudo pronto antes de começar… isso não existe.',
+          'O primeiro passo para viver de eventos não é o que tu pensas.'],
+    cta:'Descobre o primeiro passo' },
+
+  { min:7, max:11, type:'youtube', url:'https://youtube.com/live/xF7hqBVo-go?feature=share',
+    title:'É para ti, mas o <em>medo</em> está a falar mais alto.',
+    desc:['Sentes aquele entusiasmo, mas logo a seguir vem aquela voz: será que sou capaz? E se não der certo? Já há tanta gente a fazer… Eu conheço essa voz, também a ouvi durante muito tempo.',
+          'O que te está a travar não é falta de qualidade no teu trabalho, isso tens de sobra. É o medo. E o medo tem três caras: medo de falhar, falta de conhecimento do caminho, e a decisão por tomar. Vê aqui como o ultrapassar:'],
+    cta:'Quero ultrapassar o medo' },
+
+  { min:0, max:6, type:'youtube', url:'https://youtube.com/live/zkzTgQLjEk8?feature=share',
+    title:'Talvez ainda não seja o <em>teu momento.</em> E está tudo bem.',
+    desc:['Eu podia dizer-te que sim, que é para toda a gente. Mas não seria honesta contigo. Viver de eventos exige paixão, aquela coisa que te aquece o coração, que fazes sem esforço, que as pessoas já reconhecem em ti.',
+          'Se neste momento não sentes isso com força, talvez este não seja o teu momento. Mas muitas das mulheres que hoje vivem de eventos também tiveram esta dúvida. Se quiseres explorar com calma, sem compromisso, preparei um episódio onde mostro como é o dia-a-dia de quem vive de eventos.'],
+    cta:'Verifica aqui' },
+];
+
+/* ===================== MOTOR ===================== */
+const KEYS = ['A','B','C','D','E','F'];
+const TOTAL_STEPS = QUESTIONS.length + 2; // perguntas + email + nome
+const stage = document.getElementById('stage');
+const back  = document.getElementById('back');
+const bar   = document.getElementById('progress');
+
+let qi = 0;
+let phase = 'welcome';
+let score = 0;
+let submitted = false;
+const answers = new Array(QUESTIONS.length).fill(null);     // pontos
+const answersIdx = new Array(QUESTIONS.length).fill(null);  // índice escolhido (para repor seleção)
+const lead = { email:'', name:'' };
+
+if (window.self !== window.top) document.body.classList.add('in-iframe');
+
+function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function setProgress(done){ bar.style.width = Math.min(100,(done/TOTAL_STEPS)*100)+'%'; }
+function show(html, focusSel){
+  stage.innerHTML = '<section class="screen active">'+html+'</section>';
+  if(focusSel){ const el=stage.querySelector(focusSel); if(el) setTimeout(()=>el.focus(),60); }
+  window.scrollTo(0,0);
+}
+function updateBack(){ back.classList.toggle('show', phase==='q'||phase==='email'||phase==='name'); }
+
+/* --- Boas-vindas --- */
+function renderWelcome(){
+  phase='welcome'; setProgress(0); updateBack();
+  show(`
+    <h1 class="h-display">Será que viver de eventos é <em>mesmo</em> para ti?</h1>
+    <p class="lead">Responde a 7 perguntas rápidas e descobre o que te está a faltar para transformares a tua paixão por eventos num rendimento.</p>
+    <p class="fine">100% gratuito · cerca de 2 minutos</p>
+    <div class="actions">
+      <button class="btn" id="start" type="button">Quero descobrir <span class="ar">→</span></button>
+    </div>`, '#start');
+  document.getElementById('start').onclick = ()=>{ qi=0; renderQuestion(); };
+}
+
+/* --- Perguntas --- */
+function renderQuestion(){
+  phase='q'; setProgress(qi); updateBack();
+  const q = QUESTIONS[qi];
+  const opts = q.a.map((a,i)=>`
+    <li><button class="opt" type="button" data-i="${i}" data-pts="${a[1]}">
+      <span class="key" aria-hidden="true">${KEYS[i]}</span><span>${a[0]}</span>
+    </button></li>`).join('');
+  show(`
+    <p class="step">Pergunta ${qi+1} de ${QUESTIONS.length}</p>
+    <h2 class="h-q">${q.t}</h2>
+    <ul class="options">${opts}</ul>`, '.opt');
+
+  if(answersIdx[qi]!=null){
+    const prev = stage.querySelectorAll('.opt')[answersIdx[qi]];
+    if(prev) prev.classList.add('sel');
+  }
+  stage.querySelectorAll('.opt').forEach(btn=>{
+    btn.onclick = ()=>{
+      stage.querySelectorAll('.opt').forEach(b=>b.classList.remove('sel'));
+      btn.classList.add('sel');
+      answers[qi] = Number(btn.dataset.pts);
+      answersIdx[qi] = Number(btn.dataset.i);
+      setTimeout(advance, 270);
+    };
+  });
+}
+function advance(){ qi++; (qi<QUESTIONS.length) ? renderQuestion() : renderEmail(); }
+
+/* --- Email --- */
+function renderEmail(){
+  phase='email'; setProgress(QUESTIONS.length); updateBack();
+  show(`
+    <h2 class="h-q">Estou a preparar o <em>teu resultado.</em></h2>
+    <p class="lead">Deixa o teu email para receberes também o teu plano de acção personalizado (gratuito).</p>
+    <div class="field">
+      <input id="email" type="email" inputmode="email" autocomplete="email"
+             aria-label="O teu email" aria-describedby="email-err"
+             placeholder="o-teu-email@exemplo.pt" value="${esc(lead.email)}">
+      <p class="err" id="email-err" role="alert">Escreve um email válido para continuares.</p>
+    </div>
+    <div class="actions">
+      <button class="btn" id="next" type="button">Continuar <span class="ar">→</span></button>
+      <span class="hint">Não enviamos spam. Sais quando quiseres.</span>
+    </div>`, '#email');
+  const input = document.getElementById('email');
+  const go = ()=>{
+    const v = input.value.trim();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)){ document.getElementById('email-err').classList.add('on'); input.focus(); return; }
+    lead.email = v; renderName();
+  };
+  document.getElementById('next').onclick = go;
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); go(); } });
+  input.addEventListener('input', ()=>document.getElementById('email-err').classList.remove('on'));
+}
+
+/* --- Nome --- */
+function renderName(){
+  phase='name'; setProgress(QUESTIONS.length+1); updateBack();
+  show(`
+    <h2 class="h-q">E para terminar, <em>diz-me o teu nome:</em></h2>
+    <div class="field">
+      <input id="name" type="text" autocomplete="given-name" aria-label="O teu nome"
+             placeholder="O teu nome" value="${esc(lead.name)}">
+    </div>
+    <div class="actions">
+      <button class="btn" id="finish" type="button">Ver o meu resultado <span class="ar">→</span></button>
+    </div>`, '#name');
+  const input = document.getElementById('name');
+  const go = ()=>{ lead.name = input.value.trim(); submitAndResult(); };
+  document.getElementById('finish').onclick = go;
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); go(); } });
+}
+
+/* --- Submeter lead + calcular resultado --- */
+function captureLead(){
+  if(!CONFIG.mailerlite.enabled || !lead.email) return;
+  const body = new URLSearchParams();
+  body.append('fields[email]', lead.email);
+  if(lead.name) body.append('fields[name]', lead.name);
+  body.append('ml-submit','1'); body.append('anticsrf','true');
+  // fire-and-forget + keepalive (conclui mesmo se navegar logo a seguir)
+  try { fetch(CONFIG.mailerlite.endpoint, { method:'POST', body, keepalive:true }).catch(()=>{}); } catch(e){}
+}
+function outcomeFor(s){ return OUTCOMES.find(o=>s>=o.min&&s<=o.max) || OUTCOMES[0]; }
+function planoLink(key){
+  const p = new URLSearchParams(Object.assign({}, CONFIG.plano.utm, {utm_content:key}));
+  return CONFIG.plano.base + '?' + p.toString();
+}
+function submitAndResult(){
+  if(submitted) return;            // guarda contra duplo-submit
+  submitted = true;
+  const fb = document.getElementById('finish'); if(fb) fb.disabled = true;
+  phase='result'; setProgress(TOTAL_STEPS); updateBack();
+  score = answers.reduce((a,b)=>a+(b||0),0);
+  captureLead();
+  show(`
+    <p class="step">O teu resultado</p>
+    <h2 class="h-q">A preparar o teu resultado…</h2>
+    <div class="spin" aria-hidden="true"></div>`);
+  setTimeout(renderResult, 850);
+}
+function renderResult(){
+  const o = outcomeFor(score);
+  const url = o.type==='plano' ? planoLink(o.key) : o.url;
+  const hello = lead.name ? `<p class="hello">${esc(lead.name)},</p>` : '';
+  const desc = o.desc.map(d=>`<p class="desc">${d}</p>`).join('');
+  show(`
+    <section class="result">
+      ${hello}
+      <h2 class="h-q" id="res-title" tabindex="-1">${o.title}</h2>
+      ${desc}
+      <div class="actions">
+        <a class="btn" href="${url}" target="_top" rel="noopener">${o.cta} <span class="ar">→</span></a>
+      </div>
+    </section>`, '#res-title');
+}
+
+/* --- Voltar --- */
+back.onclick = ()=>{
+  if(phase==='q'){ (qi===0) ? renderWelcome() : (qi--, renderQuestion()); }
+  else if(phase==='email'){ qi=QUESTIONS.length-1; renderQuestion(); }
+  else if(phase==='name'){ renderEmail(); }
+};
+
+/* --- Teclado: A/B/C/D e 1..6 nas perguntas --- */
+document.addEventListener('keydown', e=>{
+  if(phase!=='q') return;
+  const k=e.key.toUpperCase(); let idx=-1;
+  if(KEYS.includes(k)) idx=KEYS.indexOf(k);
+  else if(/^[1-6]$/.test(e.key)) idx=Number(e.key)-1;
+  const opt = stage.querySelectorAll('.opt')[idx];
+  if(opt){ e.preventDefault(); opt.click(); }
+});
+
+renderWelcome();
+})();
+</script>
+</body>
+</html>
