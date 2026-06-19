@@ -373,20 +373,33 @@ function planoLink(key){
   return CONFIG.plano.base + '?' + p.toString();
 }
 function ansText(i){ return (answersIdx[i]!=null && QUESTIONS[i]) ? QUESTIONS[i].a[answersIdx[i]][0] : ''; }
-function sendLead(){
-  if(!CONFIG.backend.endpoint || !lead.email) return;
+function buildPayload(clicou){
   const o = outcomeFor(score);
   const dest = o.type==='plano' ? planoLink(o.key) : o.url;
   const q = new URLSearchParams(location.search);
-  const payload = {
+  return {
     email: lead.email, nome: lead.name,
     resultado: o.title.replace(/<[^>]+>/g,''), pontuacao: score, destino: dest,
     r1:ansText(0), r2:ansText(1), r3:ansText(2), r4:ansText(3), r5:ansText(4), r6:ansText(5), r7:ansText(6),
-    utm_source:q.get('utm_source')||'', utm_campaign:q.get('utm_campaign')||'', utm_content:q.get('utm_content')||''
+    utm_source:q.get('utm_source')||'', utm_campaign:q.get('utm_campaign')||'', utm_content:q.get('utm_content')||'',
+    clicou: !!clicou
   };
+}
+function sendLead(){
+  if(!CONFIG.backend.endpoint || !lead.email) return;
   // Vercel: lead ACTIVO no MailerLite + guarda tudo. Fire-and-forget + keepalive.
   try { fetch(CONFIG.backend.endpoint, { method:'POST', keepalive:true,
-        headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) }).catch(()=>{}); } catch(e){}
+        headers:{'Content-Type':'application/json'}, body:JSON.stringify(buildPayload(false)) }).catch(()=>{}); } catch(e){}
+}
+function trackClick(){
+  if(!CONFIG.backend.endpoint || !lead.email) return;
+  // Regista que clicou no link do resultado. keepalive sobrevive à navegação para o link.
+  const body = JSON.stringify(buildPayload(true));
+  try {
+    fetch(CONFIG.backend.endpoint, { method:'POST', keepalive:true, headers:{'Content-Type':'application/json'}, body }).catch(()=>{});
+  } catch(e){
+    try { navigator.sendBeacon && navigator.sendBeacon(CONFIG.backend.endpoint, new Blob([body], { type:'application/json' })); } catch(_){}
+  }
 }
 function submitAndResult(){
   if(submitted) return;            // guarda contra duplo-submit
@@ -413,9 +426,11 @@ function renderResult(){
       <h2 class="h-q" id="res-title" tabindex="-1">${o.title}</h2>
       ${desc}
       <div class="actions">
-        <a class="btn" href="${url}" target="_top" rel="noopener">${o.cta} <span class="ar">→</span></a>
+        <a class="btn" id="res-cta" href="${url}" target="_top" rel="noopener">${o.cta} <span class="ar">→</span></a>
       </div>
     </section>`, '#res-title');
+  const c = document.getElementById('res-cta');
+  if(c) c.addEventListener('click', trackClick);
 }
 
 /* --- Voltar --- */
